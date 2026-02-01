@@ -1,0 +1,12 @@
+name: nexus-discord-bot
+
+services:
+  bot:
+    environment:
+      TOKEN: ${TOKEN}
+      APPLICATION_ID: ${APPLICATION_ID}
+      TZ: ${TZ}
+    image: ghcr.io/delemangi/nexus-discord-bot:latest
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs

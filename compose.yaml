@@ -1,0 +1,14 @@
+name: nexus-discord-bot-dev
+
+services:
+  bot:
+    build: .
+    pull_policy: build
+    environment:
+      TOKEN: ${TOKEN}
+      APPLICATION_ID: ${APPLICATION_ID}
+      TZ: ${TZ}
+    image: nexus-discord-bot-dev:latest
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
