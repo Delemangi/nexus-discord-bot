@@ -1,6 +1,6 @@
 import type { CommandInteraction } from 'discord.js';
 
-import { Command } from '@sapphire/framework';
+import { type ApplicationCommandRegistry, Command } from '@sapphire/framework';
 
 export class PingCommand extends Command {
   constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -13,5 +13,11 @@ export class PingCommand extends Command {
 
   override async chatInputRun(interaction: CommandInteraction) {
     await interaction.reply('Pong!');
+  }
+
+  override registerApplicationCommands(registry: ApplicationCommandRegistry) {
+    registry.registerChatInputCommand((builder) =>
+      builder.setName(this.name).setDescription(this.description),
+    );
   }
 }
