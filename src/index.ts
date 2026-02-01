@@ -5,11 +5,7 @@ import { config } from 'dotenv';
 config();
 
 const client = new SapphireClient({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
+  intents: [GatewayIntentBits.Guilds],
   logger: {
     level: LogLevel.Info,
   },
