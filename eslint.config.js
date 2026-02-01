@@ -8,7 +8,7 @@ import {
 
 export default [
   {
-    ignores: ['dist/', 'logs/'],
+    ignores: ['dist/'],
   },
   base,
   node,
