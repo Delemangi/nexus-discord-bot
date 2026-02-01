@@ -1,4 +1,4 @@
-# Sapphire Discord Bot
+# Nexus Discord Bot
 
 A simple Discord bot using the Sapphire Framework with a ping command.
 
@@ -10,7 +10,7 @@ A simple Discord bot using the Sapphire Framework with a ping command.
    ```
 2. Add your Discord bot token to a `.env` file:
    ```env
-   DISCORD_TOKEN=your-bot-token-here
+   TOKEN=your-bot-token-here
    ```
 3. Run the bot:
    ```sh
@@ -20,5 +20,3 @@ A simple Discord bot using the Sapphire Framework with a ping command.
 ## Commands
 
 - `/ping`: Replies with `Pong!`
-
-# Nexus Discord Bot
