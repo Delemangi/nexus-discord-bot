@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../db/index.js';
 import { reminders } from '../db/schema.js';
+import { buildDeleteButtons } from '../utils/reminderButtons.js';
 
 export class ReminderCommand extends Command {
   constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -23,6 +24,9 @@ export class ReminderCommand extends Command {
     switch (subcommand) {
       case 'create':
         await this.handleCreate(interaction);
+        break;
+      case 'delete':
+        await this.handleDelete(interaction);
         break;
       case 'list':
         await this.handleList(interaction);
@@ -63,6 +67,9 @@ export class ReminderCommand extends Command {
           subcommand
             .setName('list')
             .setDescription('List your active reminders'),
+        )
+        .addSubcommand((subcommand) =>
+          subcommand.setName('delete').setDescription('Delete your reminders'),
         ),
     );
   }
@@ -104,6 +111,28 @@ export class ReminderCommand extends Command {
 
     await interaction.reply({
       content: `✅ I'll remind you ${relative} (${full}):\n> ${message}`,
+      ephemeral: true,
+    });
+  }
+
+  private async handleDelete(interaction: Command.ChatInputCommandInteraction) {
+    const userReminders = await db
+      .select()
+      .from(reminders)
+      .where(eq(reminders.userId, interaction.user.id))
+      .orderBy(reminders.remindAt);
+
+    if (userReminders.length === 0) {
+      await interaction.reply({
+        content: '📭 You have no reminders to delete.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await interaction.reply({
+      components: buildDeleteButtons(userReminders),
+      content: '🗑️ Click a button to delete a reminder:',
       ephemeral: true,
     });
   }
