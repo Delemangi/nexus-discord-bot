@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
 import * as chrono from 'chrono-node';
-import { time, TimestampStyles } from 'discord.js';
+import { MessageFlags, time, TimestampStyles } from 'discord.js';
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db/index.js';
@@ -34,7 +34,7 @@ export class ReminderCommand extends Command {
       default:
         await interaction.reply({
           content: '❌ Unknown subcommand.',
-          ephemeral: true,
+          flags: [MessageFlags.Ephemeral],
         });
     }
   }
@@ -85,7 +85,7 @@ export class ReminderCommand extends Command {
     if (parsedDate === null) {
       await interaction.reply({
         content: `❌ I couldn't understand "${when}". Try something like "in 2 hours", "tomorrow at 3pm", or "next monday".`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -93,7 +93,7 @@ export class ReminderCommand extends Command {
     if (parsedDate.getTime() <= Date.now()) {
       await interaction.reply({
         content: '❌ The reminder time must be in the future.',
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -111,7 +111,7 @@ export class ReminderCommand extends Command {
 
     await interaction.reply({
       content: `✅ I'll remind you ${relative} (${full}):\n> ${message}`,
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 
@@ -125,7 +125,7 @@ export class ReminderCommand extends Command {
     if (userReminders.length === 0) {
       await interaction.reply({
         content: '📭 You have no reminders to delete.',
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -133,7 +133,7 @@ export class ReminderCommand extends Command {
     await interaction.reply({
       components: buildDeleteButtons(userReminders),
       content: '🗑️ Click a button to delete a reminder:',
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 
@@ -147,7 +147,7 @@ export class ReminderCommand extends Command {
     if (userReminders.length === 0) {
       await interaction.reply({
         content: '📭 You have no active reminders.',
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -161,7 +161,7 @@ export class ReminderCommand extends Command {
 
     await interaction.reply({
       content: `📋 **Your Reminders** (${userReminders.length})\n\n${reminderList}`,
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 }

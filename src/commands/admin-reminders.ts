@@ -1,5 +1,10 @@
 import { Command } from '@sapphire/framework';
-import { PermissionFlagsBits, time, TimestampStyles } from 'discord.js';
+import {
+  MessageFlags,
+  PermissionFlagsBits,
+  time,
+  TimestampStyles,
+} from 'discord.js';
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db/index.js';
@@ -29,7 +34,7 @@ export class AdminRemindersCommand extends Command {
     if (userReminders.length === 0) {
       await interaction.reply({
         content: `📭 ${user.tag} has no active reminders.`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -44,7 +49,7 @@ export class AdminRemindersCommand extends Command {
 
     await interaction.reply({
       content: `📋 **Reminders for ${user.tag}** (${userReminders.length})\n\n${reminderList}`,
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 

@@ -1,5 +1,9 @@
 import { Command } from '@sapphire/framework';
-import { InteractionContextType, PermissionFlagsBits } from 'discord.js';
+import {
+  InteractionContextType,
+  MessageFlags,
+  PermissionFlagsBits,
+} from 'discord.js';
 
 const TIMEOUT_PRESETS = [
   { label: '1 minute', minutes: 1 },
@@ -26,7 +30,7 @@ export class TimeoutCommand extends Command {
     if (!interaction.inCachedGuild()) {
       await interaction.reply({
         content: '❌ This command can only be used in a server.',
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -38,7 +42,7 @@ export class TimeoutCommand extends Command {
       await interaction.reply({
         content:
           "❌ I can't timeout you. You may have higher permissions than me.",
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -50,7 +54,7 @@ export class TimeoutCommand extends Command {
 
     await interaction.reply({
       content: `🔇 You've been timed out for **${preset?.label ?? `${minutes} minutes`}**. See you later!`,
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 
