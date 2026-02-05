@@ -10,7 +10,7 @@ import { config } from 'dotenv';
 import { logger } from './logger/index.js';
 import { startReminderScheduler } from './services/reminderScheduler.js';
 
-config();
+config({ quiet: true });
 
 ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(
   RegisterBehavior.BulkOverwrite,
