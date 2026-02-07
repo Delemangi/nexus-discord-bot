@@ -116,7 +116,9 @@ export class StatisticsCommand extends Command {
     ]);
 
     const channelCounts = countChannelsByType(fetchedGuild);
-    const totalChannels = fetchedGuild.channels.cache.size;
+    const totalChannels = fetchedGuild.channels.cache.filter(
+      (c) => !c.isThread(),
+    ).size;
     const maxChannels = 500;
 
     const emojis = fetchedGuild.emojis.cache;
