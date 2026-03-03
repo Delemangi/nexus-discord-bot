@@ -7,11 +7,10 @@ import {
 } from 'discord.js';
 import { and, eq } from 'drizzle-orm';
 
+import { STAR_EMOJI } from '../constants/starboard.js';
 import { db } from '../db/index.js';
 import { guildConfig, starboardMessages } from '../db/schema.js';
 import { logger } from '../logger/index.js';
-
-const STAR_EMOJI = '⭐';
 
 export class StarboardListener extends Listener {
   constructor(context: Listener.LoaderContext, options: Listener.Options) {

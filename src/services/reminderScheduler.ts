@@ -2,11 +2,11 @@ import type { Client } from 'discord.js';
 
 import { eq, lte } from 'drizzle-orm';
 
+import { CHECK_INTERVAL } from '@/constants/reminder.js';
+
 import { db } from '../db/index.js';
 import { reminders } from '../db/schema.js';
 import { logger } from '../logger/index.js';
-
-const CHECK_INTERVAL = 10_000;
 
 const processReminders = async (client: Client) => {
   const now = new Date();
