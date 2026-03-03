@@ -26,8 +26,12 @@ export const lockdownReason = ({
   type: 'activation' | 'deactivation';
   userId: string;
   username: string;
-}) =>
-  `Lockdown ${type} by ${username} (${userId}) ${reason === undefined ? 'with no reason provided' : `with reason: ${reason}`}`;
+}) => {
+  const reasonText =
+    reason === undefined ? 'no reason provided' : `reason: ${reason}`;
+
+  return `Lockdown ${type} by ${username} (${userId}) ${reasonText}`;
+};
 
 export const buildLockdownChannelPlan = ({
   channel,
