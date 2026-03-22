@@ -36,9 +36,14 @@ export class PurgeCommand extends Command {
 
     try {
       const deleted = await channel.bulkDelete(count, true);
+      const plural = deleted.size === 1 ? '' : 's';
+      const skipped =
+        deleted.size < count
+          ? ` (${count - deleted.size} messages were older than 14 days and could not be deleted)`
+          : '';
 
       await interaction.editReply({
-        content: `🗑️ Deleted **${deleted.size}** message${deleted.size === 1 ? '' : 's'}.${deleted.size < count ? ` (${count - deleted.size} messages were older than 14 days and could not be deleted)` : ''}`,
+        content: `🗑️ Deleted **${deleted.size}** message${plural}.${skipped}`,
       });
     } catch {
       await interaction.editReply({

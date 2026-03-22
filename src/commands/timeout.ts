@@ -40,11 +40,12 @@ export class TimeoutCommand extends Command {
 
     const preset = TIMEOUT_PRESETS.find((p) => p.minutes === minutes);
     const durationMs = minutes * 60 * 1_000;
+    const durationLabel = preset?.label ?? `${minutes} minutes`;
 
     await member.timeout(durationMs, 'Self-requested timeout');
 
     await interaction.reply({
-      content: `🔇 You've been timed out for **${preset?.label ?? `${minutes} minutes`}**. See you later!`,
+      content: `🔇 You've been timed out for **${durationLabel}**. See you later!`,
       flags: [MessageFlags.Ephemeral],
     });
   }

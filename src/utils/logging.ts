@@ -2,6 +2,7 @@ import {
   ApplicationCommandOptionType,
   type CommandInteractionOption,
 } from 'discord.js';
+import { format } from 'winston';
 
 export const formatOptions = (
   opts: readonly CommandInteractionOption[],
@@ -30,3 +31,8 @@ export const formatOptions = (
 
   return ` [${formatted}]`;
 };
+
+export const formatLog = format.printf(
+  ({ level, message, timestamp }) =>
+    `${String(timestamp)} - ${level}: ${String(message)}`,
+);

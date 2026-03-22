@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import { createLogger, format, transports } from 'winston';
+
+import { formatLog } from '@/utils/logging.js';
 
 export const logger = createLogger({
   transports: [
@@ -23,10 +23,7 @@ export const logger = createLogger({
             warn: 'yellow',
           },
         }),
-        format.printf(
-          ({ level, message, timestamp }) =>
-            `${timestamp} - ${level}: ${message}`,
-        ),
+        formatLog,
       ),
       handleExceptions: true,
       level: 'info',
@@ -40,10 +37,7 @@ export const logger = createLogger({
         format.errors({
           stack: true,
         }),
-        format.printf(
-          ({ level, message, timestamp }) =>
-            `${timestamp} - ${level}: ${message}`,
-        ),
+        formatLog,
       ),
       handleExceptions: true,
       level: 'debug',

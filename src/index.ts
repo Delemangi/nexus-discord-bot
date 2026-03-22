@@ -35,4 +35,4 @@ client.once(Events.ClientReady, () => {
   startReminderScheduler(client);
 });
 
-void client.login(process.env['TOKEN']);
+await client.login(process.env['TOKEN']);
