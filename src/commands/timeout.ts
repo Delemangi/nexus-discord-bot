@@ -26,7 +26,7 @@ export class TimeoutCommand extends Command {
       return;
     }
 
-    const minutes = interaction.options.getInteger('duration', true);
+    const rawMinutes = interaction.options.getInteger('duration', true);
     const member = interaction.member;
 
     if (!member.moderatable) {
@@ -38,9 +38,18 @@ export class TimeoutCommand extends Command {
       return;
     }
 
+    const minutes =
+      rawMinutes === -1
+        ? Math.floor(Math.random() * 1_440) + 1
+        : rawMinutes;
+
     const preset = TIMEOUT_PRESETS.find((p) => p.minutes === minutes);
     const durationMs = minutes * 60 * 1_000;
-    const durationLabel = preset?.label ?? `${minutes} minutes`;
+    const durationLabel =
+      preset?.label ??
+      (minutes >= 60
+        ? `${Math.floor(minutes / 60)} hour${Math.floor(minutes / 60) !== 1 ? 's' : ''}${minutes % 60 ? ` ${minutes % 60} minute${minutes % 60 !== 1 ? 's' : ''}` : ''}`
+        : `${minutes} minute${minutes !== 1 ? 's' : ''}`);
 
     await member.timeout(durationMs, 'Self-requested timeout');
 
@@ -67,6 +76,7 @@ export class TimeoutCommand extends Command {
                 name: preset.label,
                 value: preset.minutes,
               })),
+              { name: 'Random (1 min - 1 day)', value: -1 },
             ),
         ),
     );
