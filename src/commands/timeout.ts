@@ -5,7 +5,7 @@ import {
   PermissionFlagsBits,
 } from 'discord.js';
 
-import { TIMEOUT_PRESETS } from '@/constants/timeout.js';
+import { formatDuration, TIMEOUT_PRESETS } from '@/constants/timeout.js';
 
 export class TimeoutCommand extends Command {
   constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -39,17 +39,11 @@ export class TimeoutCommand extends Command {
     }
 
     const minutes =
-      rawMinutes === -1
-        ? Math.floor(Math.random() * 1_440) + 1
-        : rawMinutes;
+      rawMinutes === -1 ? Math.floor(Math.random() * 1_440) + 1 : rawMinutes;
 
     const preset = TIMEOUT_PRESETS.find((p) => p.minutes === minutes);
     const durationMs = minutes * 60 * 1_000;
-    const durationLabel =
-      preset?.label ??
-      (minutes >= 60
-        ? `${Math.floor(minutes / 60)} hour${Math.floor(minutes / 60) !== 1 ? 's' : ''}${minutes % 60 ? ` ${minutes % 60} minute${minutes % 60 !== 1 ? 's' : ''}` : ''}`
-        : `${minutes} minute${minutes !== 1 ? 's' : ''}`);
+    const durationLabel = preset?.label ?? formatDuration(minutes);
 
     await member.timeout(durationMs, 'Self-requested timeout');
 
