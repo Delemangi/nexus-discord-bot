@@ -5,7 +5,7 @@ import {
   PermissionFlagsBits,
 } from 'discord.js';
 
-import { TIMEOUT_PRESETS } from '@/constants/timeout.js';
+import { formatDuration, TIMEOUT_PRESETS } from '@/constants/timeout.js';
 
 export class TimeoutCommand extends Command {
   constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -26,7 +26,7 @@ export class TimeoutCommand extends Command {
       return;
     }
 
-    const minutes = interaction.options.getInteger('duration', true);
+    const rawMinutes = interaction.options.getInteger('duration', true);
     const member = interaction.member;
 
     if (!member.moderatable) {
@@ -38,9 +38,12 @@ export class TimeoutCommand extends Command {
       return;
     }
 
+    const minutes =
+      rawMinutes === -1 ? Math.floor(Math.random() * 1_440) + 1 : rawMinutes;
+
     const preset = TIMEOUT_PRESETS.find((p) => p.minutes === minutes);
     const durationMs = minutes * 60 * 1_000;
-    const durationLabel = preset?.label ?? `${minutes} minutes`;
+    const durationLabel = preset?.label ?? formatDuration(minutes);
 
     await member.timeout(durationMs, 'Self-requested timeout');
 
@@ -67,6 +70,7 @@ export class TimeoutCommand extends Command {
                 name: preset.label,
                 value: preset.minutes,
               })),
+              { name: 'Random (1 min - 1 day)', value: -1 },
             ),
         ),
     );
