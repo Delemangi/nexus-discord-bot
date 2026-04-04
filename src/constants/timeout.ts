@@ -17,12 +17,13 @@ export const formatDuration = (minutes: number): string => {
   }
 
   const hourPart = hours === 1 ? '1 hour' : `${hours} hours`;
-  const minutePart =
-    remainingMinutes === 0
-      ? ''
-      : remainingMinutes === 1
-        ? ' 1 minute'
-        : ` ${remainingMinutes} minutes`;
 
-  return `${hourPart}${minutePart}`;
+  if (remainingMinutes === 0) {
+    return hourPart;
+  }
+
+  const minuteLabel =
+    remainingMinutes === 1 ? '1 minute' : `${remainingMinutes} minutes`;
+
+  return `${hourPart} ${minuteLabel}`;
 };
