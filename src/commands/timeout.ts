@@ -4,6 +4,7 @@ import {
   MessageFlags,
   PermissionFlagsBits,
 } from 'discord.js';
+import { randomInt } from 'node:crypto';
 
 import { formatDuration, TIMEOUT_PRESETS } from '@/constants/timeout.js';
 
@@ -38,8 +39,7 @@ export class TimeoutCommand extends Command {
       return;
     }
 
-    const minutes =
-      rawMinutes === -1 ? Math.floor(Math.random() * 1_440) + 1 : rawMinutes;
+    const minutes = rawMinutes === -1 ? randomInt(1, 1_441) : rawMinutes;
 
     const preset = TIMEOUT_PRESETS.find((p) => p.minutes === minutes);
     const durationMs = minutes * 60 * 1_000;
