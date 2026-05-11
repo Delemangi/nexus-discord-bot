@@ -5,11 +5,28 @@ import {
   InteractionContextType,
   MessageFlags,
   PermissionFlagsBits,
+  type SlashCommandChannelOption,
+  type SlashCommandIntegerOption,
 } from 'discord.js';
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db/index.js';
 import { guildConfig } from '../db/schema.js';
+
+const configureChannelOption = (option: SlashCommandChannelOption) =>
+  option
+    .setName('channel')
+    .setDescription('The channel for starboard messages')
+    .addChannelTypes(ChannelType.GuildText)
+    .setRequired(true);
+
+const configureCountOption = (option: SlashCommandIntegerOption) =>
+  option
+    .setName('count')
+    .setDescription('Number of stars required')
+    .setMinValue(1)
+    .setMaxValue(50)
+    .setRequired(true);
 
 export class ConfigCommand extends Subcommand {
   constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
@@ -150,13 +167,7 @@ export class ConfigCommand extends Subcommand {
               subcommand
                 .setName('channel')
                 .setDescription('Set the starboard channel')
-                .addChannelOption((option) =>
-                  option
-                    .setName('channel')
-                    .setDescription('The channel for starboard messages')
-                    .addChannelTypes(ChannelType.GuildText)
-                    .setRequired(true),
-                ),
+                .addChannelOption(configureChannelOption),
             )
             .addSubcommand((subcommand) =>
               subcommand
@@ -164,14 +175,7 @@ export class ConfigCommand extends Subcommand {
                 .setDescription(
                   'Set the minimum stars required for starboard (default: 3)',
                 )
-                .addIntegerOption((option) =>
-                  option
-                    .setName('count')
-                    .setDescription('Number of stars required')
-                    .setMinValue(1)
-                    .setMaxValue(50)
-                    .setRequired(true),
-                ),
+                .addIntegerOption(configureCountOption),
             )
             .addSubcommand((subcommand) =>
               subcommand
