@@ -5,12 +5,15 @@ import {
   SapphireClient,
 } from '@sapphire/framework';
 import { Events, GatewayIntentBits, Partials } from 'discord.js';
-import { config } from 'dotenv';
 
 import { logger } from './logger/index.js';
 import { startReminderScheduler } from './services/reminderScheduler.js';
 
-config({ quiet: true });
+try {
+  process.loadEnvFile();
+} catch {
+  // .env file is optional
+}
 
 ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(
   RegisterBehavior.BulkOverwrite,
