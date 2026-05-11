@@ -4,6 +4,7 @@ import {
   type ButtonInteraction,
   type ChannelType,
   InteractionContextType,
+  type MessageComponentInteraction,
   MessageFlags,
   PermissionFlagsBits,
 } from 'discord.js';
@@ -91,133 +92,31 @@ export class LockdownCommand extends Subcommand {
     collector.on('collect', async (i) => {
       switch (i.customId) {
         case LOCKDOWN_CUSTOM_ID.CancelButton:
-          if (!i.isButton()) {
-            return;
-          }
-
-          collector.stop('cancel');
-
+          this.handleCancelButton(i, collector);
           break;
-
         case LOCKDOWN_CUSTOM_ID.CategorySelect:
-          if (!i.isChannelSelectMenu()) {
-            return;
-          }
-
-          selections.excludedCategories = [...i.channels.keys()];
-
-          await i.deferUpdate();
-
+          await this.handleCategorySelect(i, selections);
           break;
-
         case LOCKDOWN_CUSTOM_ID.ChannelSelect:
-          if (!i.isChannelSelectMenu()) {
-            return;
-          }
-
-          selections.excludedChannels = [...i.channels.keys()];
-
-          await i.deferUpdate();
-
+          await this.handleChannelSelect(i, selections);
           break;
-
-        case LOCKDOWN_CUSTOM_ID.ConfirmButton: {
-          if (!i.isButton()) {
-            return;
-          }
-
-          await interaction.editReply({
-            components: [buildActivationComponent(selections.type, true)],
+        case LOCKDOWN_CUSTOM_ID.ConfirmButton:
+          await this.handleConfirmButton(i, selections, {
+            collector,
+            commandInteraction: interaction,
           });
-
-          const success = await this.executeLockdown(i, selections);
-
-          if (success) {
-            collector.stop();
-
-            return;
-          }
-
-          await interaction.editReply({
-            components: [buildActivationComponent(selections.type, false)],
-          });
-
           break;
-        }
-
-        case LOCKDOWN_CUSTOM_ID.ReasonButton: {
-          if (!i.isButton()) {
-            return;
-          }
-
-          await i.showModal(buildReasonModal(i.id, selections.reason));
-
-          const modalSubmit = await i
-            .awaitModalSubmit({
-              filter: (mi) =>
-                mi.customId === `${LOCKDOWN_CUSTOM_ID.ReasonModal}:${i.id}` &&
-                mi.user.id === user.id,
-              time: IDLE_LIMIT,
-            })
-            .catch(() => null);
-
-          if (modalSubmit === null) {
-            return;
-          }
-
-          const reason = modalSubmit.fields
-            .getTextInputValue(LOCKDOWN_CUSTOM_ID.ReasonInput)
-            .trim();
-
-          if (reason === '') {
-            delete selections.reason;
-          } else {
-            selections.reason = reason;
-          }
-
-          await modalSubmit.deferUpdate();
-
+        case LOCKDOWN_CUSTOM_ID.ReasonButton:
+          await this.handleReasonButton(i, selections);
           break;
-        }
-
         case LOCKDOWN_CUSTOM_ID.RoleSelect:
-          if (!i.isRoleSelectMenu()) {
-            return;
-          }
-
-          selections.excludedRoles = [...i.roles.keys()];
-
-          await i.deferUpdate();
-
+          await this.handleRoleSelect(i, selections);
           break;
-
-        case LOCKDOWN_CUSTOM_ID.TypeSelect: {
-          if (!i.isStringSelectMenu()) {
-            return;
-          }
-
-          const selectedType = Object.values(LOCKDOWN_TYPE).find(
-            (type) => type === i.values[0],
-          );
-
-          if (selectedType === undefined) {
-            return;
-          }
-
-          selections.type = selectedType;
-
-          await i.deferUpdate();
-
+        case LOCKDOWN_CUSTOM_ID.TypeSelect:
+          await this.handleTypeSelect(i, selections);
           break;
-        }
-
         default:
-          logger.warn(
-            `Received interaction with unknown customId: ${i.customId}`,
-          );
-
-          await i.deferUpdate().catch(() => null);
-
+          await this.handleUnknownInteraction(i);
           break;
       }
     });
@@ -457,7 +356,7 @@ export class LockdownCommand extends Subcommand {
           !excludedCategories.has(channel.parentId)),
     );
 
-    const channelPlans = [...filteredChannels.values()].map((channel) =>
+    const channelPlans = Array.from(filteredChannels.values(), (channel) =>
       buildLockdownChannelPlan({ channel, excludedRoles, guild, lockdownType }),
     );
     const overwriteRows = channelPlans.flatMap((plan) => plan.overwriteRows);
@@ -522,5 +421,165 @@ export class LockdownCommand extends Subcommand {
     await interaction.editReply({ content: '🔒 Lockdown activated.' });
 
     return true;
+  }
+
+  private handleCancelButton(
+    interaction: MessageComponentInteraction,
+    collector: { stop: (reason?: string) => void },
+  ) {
+    if (!interaction.isButton()) {
+      return;
+    }
+
+    collector.stop('cancel');
+  }
+
+  private async handleCategorySelect(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+  ) {
+    if (!interaction.isChannelSelectMenu()) {
+      return;
+    }
+
+    selections.excludedCategories = [...interaction.channels.keys()];
+
+    await interaction.deferUpdate();
+  }
+
+  private async handleChannelSelect(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+  ) {
+    if (!interaction.isChannelSelectMenu()) {
+      return;
+    }
+
+    selections.excludedChannels = [...interaction.channels.keys()];
+
+    await interaction.deferUpdate();
+  }
+
+  private async handleConfirmButton(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+    context: {
+      collector: { stop: (reason?: string) => void };
+      commandInteraction: Subcommand.ChatInputCommandInteraction;
+    },
+  ) {
+    if (!interaction.isButton()) {
+      return;
+    }
+
+    const { collector, commandInteraction } = context;
+
+    await commandInteraction.editReply({
+      components: [buildActivationComponent(selections.type, true)],
+    });
+
+    const success = await this.executeLockdown(interaction, selections);
+
+    if (success) {
+      collector.stop();
+
+      return;
+    }
+
+    await commandInteraction.editReply({
+      components: [buildActivationComponent(selections.type, false)],
+    });
+  }
+
+  private async handleReasonButton(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+  ) {
+    if (!interaction.isButton()) {
+      return;
+    }
+
+    const newReason = await this.promptReason(interaction, selections.reason);
+
+    if (newReason === undefined) {
+      Reflect.deleteProperty(selections, 'reason');
+    } else {
+      Reflect.set(selections, 'reason', newReason);
+    }
+  }
+
+  private async handleRoleSelect(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+  ) {
+    if (!interaction.isRoleSelectMenu()) {
+      return;
+    }
+
+    selections.excludedRoles = [...interaction.roles.keys()];
+
+    await interaction.deferUpdate();
+  }
+
+  private async handleTypeSelect(
+    interaction: MessageComponentInteraction,
+    selections: LockdownSelections,
+  ) {
+    if (!interaction.isStringSelectMenu()) {
+      return;
+    }
+
+    const selectedType = Object.values(LOCKDOWN_TYPE).find(
+      (type) => type === interaction.values[0],
+    );
+
+    if (selectedType === undefined) {
+      return;
+    }
+
+    selections.type = selectedType;
+
+    await interaction.deferUpdate();
+  }
+
+  private async handleUnknownInteraction(
+    interaction: MessageComponentInteraction,
+  ) {
+    logger.warn(
+      `Received interaction with unknown customId: ${interaction.customId}`,
+    );
+
+    await interaction.deferUpdate().catch(() => null);
+  }
+
+  private async promptReason(
+    interaction: MessageComponentInteraction,
+    currentReason?: string,
+  ): Promise<string | undefined> {
+    await interaction.showModal(
+      buildReasonModal(interaction.id, currentReason),
+    );
+
+    const modalSubmit = await interaction
+      .awaitModalSubmit({
+        filter: (mi) =>
+          mi.customId ===
+            `${LOCKDOWN_CUSTOM_ID.ReasonModal}:${interaction.id}` &&
+          mi.user.id === interaction.user.id,
+        time: IDLE_LIMIT,
+      })
+      .catch(() => null);
+
+    if (modalSubmit === null) {
+      return undefined;
+    }
+
+    const reason = modalSubmit.fields
+      .getTextInputValue(LOCKDOWN_CUSTOM_ID.ReasonInput)
+      .trim();
+
+    await modalSubmit.deferUpdate();
+
+    return reason === '' ? undefined : reason;
   }
 }
