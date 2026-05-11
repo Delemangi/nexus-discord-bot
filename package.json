@@ -3,15 +3,13 @@
     "@sapphire/framework": "^5.5.0",
     "@sapphire/plugin-subcommands": "^7.0.1",
     "@sapphire/utilities": "^3.18.2",
-    "better-sqlite3": "^12.9.0",
     "chrono-node": "^2.9.1",
     "discord.js": "^14.26.4",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "^1.0.0-rc.2-e38a2ba",
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^1.0.0-rc.2-e38a2ba",
     "esbuild": "^0.28.0",
     "eslint": "^10.3.0",
     "eslint-config-imperium": "^4.0.2",

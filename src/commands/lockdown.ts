@@ -64,9 +64,11 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    const lockdownSession = await db.query.lockdownSessions.findFirst({
-      where: eq(lockdownSessions.guildId, guild.id),
-    });
+    const lockdownSession = db
+      .select()
+      .from(lockdownSessions)
+      .where(eq(lockdownSessions.guildId, guild.id))
+      .get();
 
     if (lockdownSession !== undefined) {
       await interaction.reply({
@@ -143,9 +145,11 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    const lockdownSession = await db.query.lockdownSessions.findFirst({
-      where: eq(lockdownSessions.guildId, guild.id),
-    });
+    const lockdownSession = db
+      .select()
+      .from(lockdownSessions)
+      .where(eq(lockdownSessions.guildId, guild.id))
+      .get();
 
     if (lockdownSession === undefined) {
       await interaction.reply({
@@ -161,9 +165,11 @@ export class LockdownCommand extends Subcommand {
       flags: [MessageFlags.Ephemeral],
     });
 
-    const savedOverwrites = await db.query.lockdownOverwrites.findMany({
-      where: eq(lockdownOverwrites.guildId, guild.id),
-    });
+    const savedOverwrites = db
+      .select()
+      .from(lockdownOverwrites)
+      .where(eq(lockdownOverwrites.guildId, guild.id))
+      .all();
 
     const allChannels = await guild.channels.fetch();
 
@@ -248,9 +254,11 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    const lockdownSession = await db.query.lockdownSessions.findFirst({
-      where: eq(lockdownSessions.guildId, guild.id),
-    });
+    const lockdownSession = db
+      .select()
+      .from(lockdownSessions)
+      .where(eq(lockdownSessions.guildId, guild.id))
+      .get();
 
     if (lockdownSession === undefined) {
       await interaction.reply({
@@ -316,9 +324,11 @@ export class LockdownCommand extends Subcommand {
       return false;
     }
 
-    const lockdownSession = await db.query.lockdownSessions.findFirst({
-      where: eq(lockdownSessions.guildId, guild.id),
-    });
+    const lockdownSession = db
+      .select()
+      .from(lockdownSessions)
+      .where(eq(lockdownSessions.guildId, guild.id))
+      .get();
 
     if (lockdownSession !== undefined) {
       await interaction.reply({
