@@ -5,11 +5,11 @@
     "@sapphire/utilities": "^3.18.2",
     "chrono-node": "^2.9.1",
     "discord.js": "^14.26.4",
-    "drizzle-orm": "^1.0.0-rc.4-273829f",
+    "drizzle-orm": "1.0.0-rc.3",
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "drizzle-kit": "^1.0.0-rc.4-273829f",
+    "drizzle-kit": "1.0.0-rc.3",
     "esbuild": "^0.28.1",
     "eslint": "^10.5.0",
     "eslint-config-imperium": "^4.0.2",
