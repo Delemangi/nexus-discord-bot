@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-top-level-side-effects -- this module bootstraps the SQLite connection and runs pending migrations on import */
 import { drizzle } from 'drizzle-orm/node-sqlite';
 import { migrate } from 'drizzle-orm/node-sqlite/migrator';
 import { mkdirSync } from 'node:fs';

@@ -31,6 +31,10 @@ const config = [
           ],
         },
       ],
+      // Drizzle `mode: 'timestamp'` columns, chrono-node, and discord.js all
+      // operate on native `Date`, so `Temporal` cannot be used at these call
+      // sites without breaking type-checking and runtime behavior.
+      'unicorn/prefer-temporal': 'off',
     },
   },
 ];
