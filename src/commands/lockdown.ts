@@ -6,6 +6,7 @@ import {
   InteractionContextType,
   type MessageComponentInteraction,
   MessageFlags,
+  type ModalSubmitInteraction,
   PermissionFlagsBits,
 } from 'discord.js';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -127,7 +128,12 @@ export class LockdownCommand extends Subcommand {
       switch (reason) {
         case 'cancel':
         case 'idle':
-          await interaction.deleteReply().catch(() => null);
+          try {
+            await interaction.deleteReply();
+          } catch {
+            // The reply may already be deleted.
+          }
+
           break;
 
         default:
@@ -406,9 +412,9 @@ export class LockdownCommand extends Subcommand {
     }
 
     await Promise.allSettled(
-      channelPlans.map(({ channel, newOverwrites }) =>
-        channel.permissionOverwrites
-          .set(
+      channelPlans.map(async ({ channel, newOverwrites }) => {
+        try {
+          await channel.permissionOverwrites.set(
             newOverwrites,
             lockdownReason({
               ...(selections.reason !== undefined && {
@@ -418,14 +424,14 @@ export class LockdownCommand extends Subcommand {
               userId: user.id,
               username: user.username,
             }),
-          )
-          .catch((error: unknown) =>
-            logger.error(
-              `Failed to set overwrites for channel ${channel.id}:`,
-              error,
-            ),
-          ),
-      ),
+          );
+        } catch (error) {
+          logger.error(
+            `Failed to set overwrites for channel ${channel.id}:`,
+            error,
+          );
+        }
+      }),
     );
 
     await interaction.editReply({ content: '🔒 Lockdown activated.' });
@@ -452,7 +458,7 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    selections.excludedCategories = [...interaction.channels.keys()];
+    selections.excludedCategories = interaction.channels.keys().toArray();
 
     await interaction.deferUpdate();
   }
@@ -465,7 +471,7 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    selections.excludedChannels = [...interaction.channels.keys()];
+    selections.excludedChannels = interaction.channels.keys().toArray();
 
     await interaction.deferUpdate();
   }
@@ -526,7 +532,7 @@ export class LockdownCommand extends Subcommand {
       return;
     }
 
-    selections.excludedRoles = [...interaction.roles.keys()];
+    selections.excludedRoles = interaction.roles.keys().toArray();
 
     await interaction.deferUpdate();
   }
@@ -559,7 +565,11 @@ export class LockdownCommand extends Subcommand {
       `Received interaction with unknown customId: ${interaction.customId}`,
     );
 
-    await interaction.deferUpdate().catch(() => null);
+    try {
+      await interaction.deferUpdate();
+    } catch {
+      // The interaction may have already been acknowledged.
+    }
   }
 
   private async promptReason(
@@ -570,17 +580,17 @@ export class LockdownCommand extends Subcommand {
       buildReasonModal(interaction.id, currentReason),
     );
 
-    const modalSubmit = await interaction
-      .awaitModalSubmit({
+    let modalSubmit: ModalSubmitInteraction;
+
+    try {
+      modalSubmit = await interaction.awaitModalSubmit({
         filter: (mi) =>
           mi.customId ===
             `${LOCKDOWN_CUSTOM_ID.ReasonModal}:${interaction.id}` &&
           mi.user.id === interaction.user.id,
         time: IDLE_LIMIT,
-      })
-      .catch(() => null);
-
-    if (modalSubmit === null) {
+      });
+    } catch {
       return undefined;
     }
 

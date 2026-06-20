@@ -1,6 +1,7 @@
 import { Command, CommandOptionsRunTypeEnum } from '@sapphire/framework';
 import {
   DiscordAPIError,
+  type GuildMember,
   InteractionContextType,
   MessageFlags,
   PermissionFlagsBits,
@@ -35,18 +36,20 @@ export class AdminRemindersCommand extends Command {
 
     const user = options.getUser('user', true);
 
-    const guildMember = await guild.members
-      .fetch(user.id)
-      .catch((error: unknown) => {
-        if (
+    let guildMember: GuildMember | null = null;
+
+    try {
+      guildMember = await guild.members.fetch(user.id);
+    } catch (error) {
+      if (
+        !(
           error instanceof DiscordAPIError &&
           error.code === RESTJSONErrorCodes.UnknownMember
-        ) {
-          return null;
-        }
-
+        )
+      ) {
         throw error;
-      });
+      }
+    }
 
     if (guildMember === null) {
       await interaction.reply({

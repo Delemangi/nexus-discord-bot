@@ -55,13 +55,15 @@ export class ReminderCommand extends Subcommand {
       return;
     }
 
-    await db.insert(reminders).values({
-      channelId: interaction.channelId,
-      guildId: interaction.guildId,
-      message,
-      remindAt: parsedDate,
-      userId: interaction.user.id,
-    });
+    db.insert(reminders)
+      .values({
+        channelId: interaction.channelId,
+        guildId: interaction.guildId,
+        message,
+        remindAt: parsedDate,
+        userId: interaction.user.id,
+      })
+      .run();
 
     const relative = time(parsedDate, TimestampStyles.RelativeTime);
     const full = time(parsedDate, TimestampStyles.LongDate);

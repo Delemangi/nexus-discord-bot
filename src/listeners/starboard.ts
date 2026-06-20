@@ -88,7 +88,7 @@ export class StarboardListener extends Listener {
 
     const header = `${message.author.toString()} in <#${message.channelId}> (${hyperlink('jump', message.url)})`;
     const quote = message.content
-      ? `> ${message.content.split('\n').join('\n> ')}`
+      ? `> ${message.content.replaceAll('\n', '\n> ')}`
       : '';
 
     const contentParts = [header, quote].filter(Boolean);
@@ -101,13 +101,15 @@ export class StarboardListener extends Listener {
         files,
       });
 
-      await db.insert(starboardMessages).values({
-        guildId,
-        originalChannelId: message.channelId,
-        originalMessageId: message.id,
-        starboardMessageId: starboardMsg.id,
-        starCount,
-      });
+      db.insert(starboardMessages)
+        .values({
+          guildId,
+          originalChannelId: message.channelId,
+          originalMessageId: message.id,
+          starboardMessageId: starboardMsg.id,
+          starCount,
+        })
+        .run();
 
       logger.info(
         `Created starboard entry for message ${message.id} in guild ${guildId}`,

@@ -107,9 +107,17 @@ export class StatisticsCommand extends Command {
 
     await interaction.deferReply();
 
+    const fetchInvites = async () => {
+      try {
+        return await guild.invites.fetch();
+      } catch {
+        return null;
+      }
+    };
+
     const [fetchedGuild, invites] = await Promise.all([
       guild.fetch(),
-      guild.invites.fetch().catch(() => null),
+      fetchInvites(),
     ]);
 
     const channelCounts = countChannelsByType(fetchedGuild);
