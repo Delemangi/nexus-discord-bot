@@ -23,7 +23,7 @@
     "noUnusedParameters": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true,
     "target": "ESNext",
     "paths": {
@@ -34,8 +34,5 @@
   },
   "exclude": [
     "dist",
-  ],
-  "include": [
-    "src",
   ]
 }
