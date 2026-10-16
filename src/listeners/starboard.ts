@@ -51,6 +51,8 @@ export class StarboardListener extends Listener {
 
     if (!config?.starboardChannelId) return;
 
+    // Preserve the fallback for explicitly null values stored in the database.
+    // eslint-disable-next-line unicorn/prefer-default-parameters -- destructuring defaults do not handle null
     const { starboardChannelId, starboardThreshold } = config;
     const threshold = starboardThreshold ?? 3;
 
