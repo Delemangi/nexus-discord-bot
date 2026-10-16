@@ -41,12 +41,10 @@ export class AdminRemindersCommand extends Command {
     try {
       guildMember = await guild.members.fetch(user.id);
     } catch (error) {
-      if (
-        !(
-          error instanceof DiscordAPIError &&
-          error.code === RESTJSONErrorCodes.UnknownMember
-        )
-      ) {
+      if (!(
+        error instanceof DiscordAPIError &&
+        error.code === RESTJSONErrorCodes.UnknownMember
+      )) {
         throw error;
       }
     }
