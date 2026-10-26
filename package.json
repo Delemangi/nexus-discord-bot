@@ -9,7 +9,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "drizzle-kit": "1.0.0-rc.5-5935859",
+    "drizzle-kit": "1.0.0-rc.5",
     "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
     "eslint-config-imperium": "^4.1.5",
