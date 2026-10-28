@@ -503,7 +503,7 @@ export class LockdownCommand extends Subcommand {
     }
 
     await commandInteraction.editReply({
-      components: [buildActivationComponent(selections.type, false)],
+      components: [buildActivationComponent(selections.type)],
     });
   }
 

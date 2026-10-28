@@ -16,7 +16,14 @@ const processReminders = async (client: Client) => {
     .from(reminders)
     .where(lte(reminders.remindAt, now));
 
-  for (const reminder of dueReminders) {
+  const pendingReminders = dueReminders.values();
+
+  const processNextReminder = async (): Promise<void> => {
+    const next = pendingReminders.next();
+
+    if (next.done) return;
+
+    const reminder = next.value;
     try {
       const content = `🔔 Reminder:\n> ${reminder.message}`;
 
@@ -38,7 +45,10 @@ const processReminders = async (client: Client) => {
     }
 
     await db.delete(reminders).where(eq(reminders.id, reminder.id));
-  }
+    await processNextReminder();
+  };
+
+  await processNextReminder();
 };
 
 export const startReminderScheduler = (client: Client) => {
