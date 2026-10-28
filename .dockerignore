@@ -5,5 +5,7 @@ data
 .git
 .gitignore
 .eslintcache
+.env
+.env.*
 *.log
 *.md
