@@ -4,7 +4,7 @@
     "@sapphire/plugin-subcommands": "^7.0.1",
     "chrono-node": "^2.10.3",
     "discord.js": "^14.28.1",
-    "drizzle-orm": "1.0.0-rc.5",
+    "drizzle-orm": "1.0.0-rc.6",
     "winston": "^3.19.0"
   },
   "devDependencies": {
